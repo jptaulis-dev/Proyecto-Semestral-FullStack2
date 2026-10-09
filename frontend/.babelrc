@@ -1,0 +1,13 @@
+{
+  "presets": [
+    ["@babel/preset-env", { "modules": "commonjs", "targets": { "chrome": "100" } }],
+    ["@babel/preset-react", { "runtime": "automatic" }]
+  ],
+  "env": {
+    "test": {
+      "plugins": [
+        ["istanbul", { "exclude": ["src/test/**", "src/main.jsx", "**/*.spec.jsx"] }]
+      ]
+    }
+  }
+}
