@@ -13,6 +13,7 @@ const ENLACES = [
   { to: '/historial', label: 'Historial', roles: Object.values(ROLES) },
   { to: '/admin/usuarios', label: 'Usuarios', roles: [ROLES.ADMIN] },
   { to: '/ubicacion', label: 'Cómo llegar', roles: Object.values(ROLES) },
+  { to: '/solicitudes', label: 'Solicitudes', roles: [ROLES.RECEPCION, ROLES.ADMIN] },
 ];
 
 export default function AppNavbar() {
