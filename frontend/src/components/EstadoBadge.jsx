@@ -4,9 +4,10 @@ const COLORES = { PENDIENTE: 'warning', CONFIRMADA: 'success', REAGENDADA: 'info
 const TEXTO = { PENDIENTE: 'Pendiente', CONFIRMADA: 'Confirmada', REAGENDADA: 'Reagendada', CANCELADA: 'Cancelada' };
 
 export default function EstadoBadge({ estado }) {
+  const clave = estado?.toUpperCase();
   return (
-    <Badge bg={COLORES[estado] ?? 'secondary'} text={estado === 'PENDIENTE' ? 'dark' : undefined}>
-      {TEXTO[estado] ?? estado}
+    <Badge bg={COLORES[clave] ?? 'secondary'} text={clave === 'PENDIENTE' ? 'dark' : undefined}>
+      {TEXTO[clave] ?? estado}
     </Badge>
   );
 }

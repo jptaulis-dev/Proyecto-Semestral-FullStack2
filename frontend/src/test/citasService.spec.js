@@ -1,9 +1,12 @@
-import { listarCitas, reiniciarCitas } from "../services/citasService";
-import { listarCitasDeDueno } from "../services/citasService";
-import { crearCita } from "../services/citasService";
-import { actualizarCita } from "../services/citasService";
-import { eliminarCita } from "../services/citasService";
-import { actualizarCita } from "../services/citasService";
+import { citas as citasIniciales } from "../data/citas";
+import {
+  listarCitas,
+  listarCitasDeDueno,
+  crearCita,
+  actualizarCita,
+  eliminarCita,
+  reiniciarCitas,
+} from "../services/citasService";
 
 describe('citasService (CRUD simulado)', () => {
   beforeEach(() => reiniciarCitas());

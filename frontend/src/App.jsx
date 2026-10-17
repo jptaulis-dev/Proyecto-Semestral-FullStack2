@@ -4,6 +4,9 @@ import { AuthProvider, useAuth, USUARIOS_DEMO } from './context/AuthContext';
 import AppNavbar from './components/AppNavbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import MapaUbicacion from './components/MapaUbicacion';
+import SolicitarCita from './pages/dueno/Solicitarcita';
+import MisCitas from './pages/dueno/MisCitas';
+import SolicitudesPendientes from './pages/recepcion/SolicitudesPendientes';
 import { ROLES } from './constants/roles';
 
 function Inicio() {
@@ -45,7 +48,17 @@ function LoginDemo() {
         <p className="text-muted">Selecciona una cuenta para ingresar al sistema:</p>
         <div className="d-grid gap-2">
           {USUARIOS_DEMO.map((u) => (
-            <Button key={u.id} variant="primary" as="a" href="/" onClick={(e) => { e.preventDefault(); login(u); window.location.href = '/'; }}>
+            <Button
+              key={u.id}
+              variant="primary"
+              as="a"
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                login(u);
+                window.location.href = '/';
+              }}
+            >
               Ingresar como {u.rol} ({u.nombre})
             </Button>
           ))}
@@ -59,7 +72,6 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        {/* Estilo rápido para el color de la barra de tu compañero */}
         <style>{`.navbar-vsm { background-color: #1b4332; }`}</style>
         <AppNavbar />
         <Container className="mt-4">
@@ -74,6 +86,30 @@ export default function App() {
               }
             />
             <Route
+              path="/citas/nueva"
+              element={
+                <ProtectedRoute roles={[ROLES.DUENO]}>
+                  <SolicitarCita />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/mis-citas"
+              element={
+                <ProtectedRoute roles={[ROLES.DUENO]}>
+                  <MisCitas />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/solicitudes"
+              element={
+                <ProtectedRoute roles={[ROLES.RECEPCION, ROLES.ADMIN]}>
+                  <SolicitudesPendientes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/ubicacion"
               element={
                 <ProtectedRoute roles={Object.values(ROLES)}>
@@ -81,7 +117,10 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/no-autorizado" element={<h3 className="text-danger mt-5 text-center">⛔ No tienes permisos para ver esta sección.</h3>} />
+            <Route
+              path="/no-autorizado"
+              element={<h3 className="text-danger mt-5 text-center">⛔ No tienes permisos para ver esta sección.</h3>}
+            />
             <Route path="*" element={<h4 className="text-center mt-5">🚧 Vista en construcción...</h4>} />
           </Routes>
         </Container>
