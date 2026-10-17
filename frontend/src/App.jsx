@@ -8,6 +8,8 @@ import SolicitarCita from './pages/dueno/Solicitarcita';
 import MisCitas from './pages/dueno/MisCitas';
 import SolicitudesPendientes from './pages/recepcion/SolicitudesPendientes';
 import { ROLES } from './constants/roles';
+import Agenda from './pages/recepcion/Agenda';
+import Mascotas from './pages/Mascotas';
 
 function Inicio() {
   const { usuario, login } = useAuth();
@@ -106,6 +108,22 @@ export default function App() {
               element={
                 <ProtectedRoute roles={[ROLES.RECEPCION, ROLES.ADMIN]}>
                   <SolicitudesPendientes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/agenda"
+              element={
+                <ProtectedRoute roles={[ROLES.RECEPCION, ROLES.ADMIN]}>
+                  <Agenda />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/mascotas"
+              element={
+                <ProtectedRoute roles={Object.values(ROLES)}>
+                  <Mascotas />
                 </ProtectedRoute>
               }
             />
