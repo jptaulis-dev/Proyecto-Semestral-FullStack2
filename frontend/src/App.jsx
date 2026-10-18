@@ -10,6 +10,8 @@ import SolicitudesPendientes from './pages/recepcion/SolicitudesPendientes';
 import { ROLES } from './constants/roles';
 import Agenda from './pages/recepcion/Agenda';
 import Mascotas from './pages/Mascotas';
+import Historial from './pages/Historial';
+import Usuarios from './pages/admin/Usuarios';
 
 function Inicio() {
   const { usuario, login } = useAuth();
@@ -124,6 +126,22 @@ export default function App() {
               element={
                 <ProtectedRoute roles={Object.values(ROLES)}>
                   <Mascotas />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/historial"
+              element={
+                <ProtectedRoute roles={Object.values(ROLES)}>
+                  <Historial />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/usuarios"
+              element={
+                <ProtectedRoute roles={[ROLES.ADMIN]}>
+                  <Usuarios />
                 </ProtectedRoute>
               }
             />

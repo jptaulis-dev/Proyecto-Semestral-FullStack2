@@ -1,0 +1,15 @@
+export const medicamentos = [
+  { codigo: 'ME001', categoria: 'Antibióticos', nombre: 'Amoxibay 250mg', principio: 'Amoxicilina', presentacion: 'Blíster 10 comp.', especies: ['perro', 'gato'], stock: 45, precio: 4200 },
+  { codigo: 'ME002', categoria: 'Antibióticos', nombre: 'Enrox 50mg', principio: 'Enrofloxacino', presentacion: 'Blíster 10 comp.', especies: ['perro', 'gato'], stock: 30, precio: 6800 },
+  { codigo: 'ME003', categoria: 'Antibióticos', nombre: 'Metrobay 250mg', principio: 'Metronidazol', presentacion: 'Blíster 10 comp.', especies: ['perro', 'gato'], stock: 28, precio: 3900 },
+  { codigo: 'ME004', categoria: 'Antiparasitarios', nombre: 'Nexgard', principio: 'Afoxolaner', presentacion: 'Masticable 1 unid.', especies: ['perro'], stock: 60, precio: 9500 },
+  { codigo: 'ME005', categoria: 'Antiparasitarios', nombre: 'Bravecto', principio: 'Fluralaner', presentacion: 'Masticable 1 unid.', especies: ['perro'], stock: 40, precio: 18900 },
+  { codigo: 'ME006', categoria: 'Antiparasitarios', nombre: 'Revolution Plus', principio: 'Selamectina+Sarolaner', presentacion: 'Pipeta 1 unid.', especies: ['gato'], stock: 35, precio: 14500 },
+  { codigo: 'ME009', categoria: 'Antiinflamatorios', nombre: 'Meloxicam 1mg', principio: 'Meloxicam', presentacion: 'Blíster 10 comp.', especies: ['perro', 'gato'], stock: 55, precio: 4500 },
+  { codigo: 'ME013', categoria: 'Dermatología', nombre: 'Apoquel 16mg', principio: 'Oclacitinib', presentacion: 'Blíster 10 comp.', especies: ['perro'], stock: 18, precio: 22000 },
+  { codigo: 'ME014', categoria: 'Digestivo', nombre: 'Probifor', principio: 'Bacillus clausii', presentacion: 'Sobre 5ml x10', especies: ['perro', 'gato'], stock: 40, precio: 5600 },
+  { codigo: 'ME018', categoria: 'Vacunas', nombre: 'Nobivac DHPPi', principio: 'Vacuna polivalente', presentacion: 'Vial 1 dosis', especies: ['perro'], stock: 48, precio: 8500 },
+  { codigo: 'ME019', categoria: 'Vacunas', nombre: 'Nobivac Rabies', principio: 'Vacuna antirrábica', presentacion: 'Vial 1 dosis', especies: ['perro', 'gato'], stock: 60, precio: 5800 },
+  { codigo: 'ME020', categoria: 'Vacunas', nombre: 'Felocell CVR', principio: 'Vacuna triple felina', presentacion: 'Vial 1 dosis', especies: ['gato'], stock: 36, precio: 7200 },
+  { codigo: 'ME021', categoria: 'Suplementos', nombre: 'Omega vet 3-6-9', principio: 'Ácidos grasos omega', presentacion: 'Frasco 100ml', especies: ['perro', 'gato'], stock: 30, precio: 9900 },
+];
