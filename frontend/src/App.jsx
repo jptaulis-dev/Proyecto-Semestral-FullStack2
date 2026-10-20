@@ -1,74 +1,35 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Container, Card, Button, ButtonGroup } from 'react-bootstrap';
-import { AuthProvider, useAuth, USUARIOS_DEMO } from './context/AuthContext';
+import { Container, Card } from 'react-bootstrap';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import AppNavbar from './components/AppNavbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import MapaUbicacion from './components/MapaUbicacion';
-import SolicitarCita from './pages/dueno/SolicitarCita';
+import SolicitarCita from './pages/dueno/Solicitarcita';
 import MisCitas from './pages/dueno/MisCitas';
 import SolicitudesPendientes from './pages/recepcion/SolicitudesPendientes';
-import { ROLES } from './constants/roles';
 import Agenda from './pages/recepcion/Agenda';
 import Mascotas from './pages/Mascotas';
 import Historial from './pages/Historial';
 import Usuarios from './pages/admin/Usuarios';
+import Login from './pages/Login'; // Importamos el login real
+import { ROLES } from './constants/roles';
 
 function Inicio() {
-  const { usuario, login } = useAuth();
+  const { usuario } = useAuth();
 
   return (
     <div className="py-4">
       <Card className="shadow-sm mb-4 border-primary">
         <Card.Body>
-          <Card.Title>🐾 Bienvenido a Veterinaria San Marcos, {usuario?.nombre}</Card.Title>
-          <Card.Text className="text-muted mb-3">
-            Panel de prueba de roles: cambia de usuario aquí abajo para ver cómo se adapta el menú de navegación según los permisos del sistema.
+          <Card.Title>🐾 Bienvenido al portal de Veterinaria San Marcos</Card.Title>
+          <Card.Text className="text-muted mb-0">
+            Has iniciado sesión exitosamente como <strong>{usuario?.nombre}</strong>. Utiliza el menú superior para navegar por las opciones disponibles para tu rol.
           </Card.Text>
-          <ButtonGroup className="flex-wrap">
-            {USUARIOS_DEMO.map((u) => (
-              <Button
-                key={u.id}
-                variant={usuario?.rol === u.rol ? 'primary' : 'outline-primary'}
-                onClick={() => login(u)}
-              >
-                Ver como: {u.rol} ({u.nombre})
-              </Button>
-            ))}
-          </ButtonGroup>
         </Card.Body>
       </Card>
 
       <MapaUbicacion />
     </div>
-  );
-}
-
-function LoginDemo() {
-  const { login } = useAuth();
-  return (
-    <Card className="mx-auto mt-5 shadow-sm" style={{ maxWidth: '420px' }}>
-      <Card.Body className="text-center">
-        <h3 className="mb-3">Iniciar Sesión</h3>
-        <p className="text-muted">Selecciona una cuenta para ingresar al sistema:</p>
-        <div className="d-grid gap-2">
-          {USUARIOS_DEMO.map((u) => (
-            <Button
-              key={u.id}
-              variant="primary"
-              as="a"
-              href="/"
-              onClick={(e) => {
-                e.preventDefault();
-                login(u);
-                window.location.href = '/';
-              }}
-            >
-              Ingresar como {u.rol} ({u.nombre})
-            </Button>
-          ))}
-        </div>
-      </Card.Body>
-    </Card>
   );
 }
 
@@ -80,7 +41,7 @@ export default function App() {
         <AppNavbar />
         <Container className="mt-4">
           <Routes>
-            <Route path="/login" element={<LoginDemo />} />
+            <Route path="/login" element={<Login />} />
             <Route
               path="/"
               element={

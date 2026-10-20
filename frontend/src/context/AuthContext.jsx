@@ -3,21 +3,33 @@ import { ROLES } from '../constants/roles';
 
 const AuthContext = createContext(null);
 
+// Agregamos la propiedad 'password' a los usuarios de prueba
 export const USUARIOS_DEMO = [
-  { id: 1, nombre: 'Juan Pablo ', email: 'admin@juanpablo.cl', rol: ROLES.ADMIN },
-  { id: 2, nombre: 'Marcela Soto', email: 'recepcion@sanmarcos.cl', rol: ROLES.RECEPCION },
-  { id: 3, nombre: 'Alejandro Chandia', email: 'alej.chandia@duocuc.cl', rol: ROLES.DUENO },
+  { id: 1, nombre: 'Juan Pablo', email: 'admin@juanpablo.cl', password: 'password123', rol: ROLES.ADMIN },
+  { id: 2, nombre: 'Marcela Soto', email: 'recepcion@sanmarcos.cl', password: 'password123', rol: ROLES.RECEPCION },
+  { id: 3, nombre: 'Alejandro Chandia', email: 'alej.chandia@duocuc.cl', password: 'password123', rol: ROLES.DUENO },
 ];
 
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(() => {
     const guardado = localStorage.getItem('vsm_usuario');
-    return guardado ? JSON.parse(guardado) : USUARIOS_DEMO[2]; // Inicia como Dueño por defecto
+    // Empezamos como null para forzar que pase por la pantalla de Login
+    return guardado ? JSON.parse(guardado) : null; 
   });
 
-  const login = (datosUsuario) => {
-    setUsuario(datosUsuario);
-    localStorage.setItem('vsm_usuario', JSON.stringify(datosUsuario));
+  // Nueva lógica que valida correo y contraseña
+  const login = (email, password) => {
+    const userEncontrado = USUARIOS_DEMO.find(
+      (u) => u.email === email && u.password === password
+    );
+    
+    if (userEncontrado) {
+      setUsuario(userEncontrado);
+      localStorage.setItem('vsm_usuario', JSON.stringify(userEncontrado));
+      return { exito: true };
+    } else {
+      return { exito: false, mensaje: 'Correo electrónico o contraseña incorrectos.' };
+    }
   };
 
   const logout = () => {
