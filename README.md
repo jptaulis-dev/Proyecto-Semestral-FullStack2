@@ -1,33 +1,47 @@
-# Proyecto Semestral FullStack 2
+# 🐾 Veterinaria San Marcos - Proyecto Semestral FullStack
 
-Aplicación web para la gestión de una clínica veterinaria. El repositorio contiene el frontend desarrollado con React y la documentación del proyecto.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
+![Testing](https://img.shields.io/badge/Testing-Karma%20%7C%20Jasmine-8A2BE2?style=for-the-badge)
 
-## Estructura del repositorio
+Aplicación web desarrollada como **Single Page Application (SPA)** para la gestión y agendamiento de citas de una clínica veterinaria. Este repositorio contiene el frontend interactivo construido con React y la documentación oficial del proyecto.
+
+---
+
+## 🚀 Tecnologías Utilizadas
+
+*   **Core:** React.js y React Router DOM (para navegación SPA).
+*   **Build Tool:** Vite (empaquetador ultrarrápido).
+*   **UI & Estilos:** Bootstrap y React-Bootstrap (diseño 100% responsivo).
+*   **Mapas:** Leaflet y React-Leaflet (mapa interactivo con geolocalización).
+*   **Testing:** Karma y Jasmine (Suite de 82 pruebas unitarias automatizadas).
+
+---
+
+## 📂 Estructura del Repositorio
+
+El proyecto está dividido de forma modular para separar la documentación académica de la lógica de negocio y las vistas del cliente:
 
 ```text
 Proyecto-Semestral-FullStack2/
-├── documentacion/
-│   └── captura/                  # Capturas y evidencias del proyecto
-├── frontend/
-│   ├── index.html
-│   ├── package.json              # Dependencias y comandos del frontend
-│   ├── vite.config.js
-│   ├── karma.conf.cjs
-│   ├── webpack.test.config.cjs
-│   └── src/
-│       ├── App.jsx
-│       ├── main.jsx
-│       ├── components/           # Componentes compartidos y de citas
-│       ├── constants/            # Constantes de la aplicación
-│       ├── context/              # Contexto de autenticación
-│       ├── data/                 # Datos de usuarios, mascotas y servicios
-│       ├── pages/                # Vistas de administración, recepción y dueños
-│       ├── services/             # Servicios de citas, usuarios e historial
-│       ├── test/                 # Pruebas automatizadas
-│       └── utils/                # Utilidades de citas y horarios
-├── package.json                  # Dependencias a nivel raíz
-└── README.md
-```
+├── documentacion/                 # Documentación del proyecto (Word/Excel)
+│   ├── captura/                   # Capturas de pantalla y evidencias visuales
+│   └── 09_Plantilla_Documento_Cobertura_Testing_EP2.docx
+├── frontend/                      # Aplicación React
+│   ├── src/                       
+│   │   ├── components/            # Componentes reutilizables (Tablas, Navbar, Badges)
+│   │   ├── constants/             # Constantes globales de la aplicación (Roles RBAC)
+│   │   ├── context/               # Contexto de autenticación y sesión
+│   │   ├── data/                  # Datos locales y mocks iniciales
+│   │   ├── pages/                 # Vistas protegidas según rol de usuario
+│   │   ├── services/              # Lógica de negocio (CRUD simulado con localStorage)
+│   │   ├── test/                  # Suite de 82 pruebas unitarias
+│   │   └── utils/                 # Utilidades de formato (Fechas, Horarios)
+│   ├── karma.conf.cjs             # Configuración del entorno de pruebas
+│   ├── package.json               # Dependencias del frontend
+│   └── vite.config.js             # Configuración de Vite
+└── README.md                      # Este documento
 
 ## Tecnologías
 
