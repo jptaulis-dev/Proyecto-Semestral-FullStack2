@@ -4,6 +4,47 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Veterinaria San Marcos</title>
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      }
+      .card {
+        border: none !important;
+        border-radius: 12px;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+      }
+      .btn {
+        border-radius: 8px;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        transition: all 0.3s;
+      }
+      .btn:hover {
+        opacity: 0.9;
+      }
+      .table {
+        border-collapse: separate;
+        border-spacing: 0 8px;
+      }
+      .table tr {
+        background-color: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+      }
+      .table td, .table th {
+        border: none;
+        padding: 1rem;
+      }
+      .badge {
+        font-weight: 500;
+        padding: 0.5em 0.8em;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

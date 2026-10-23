@@ -13,6 +13,7 @@ import Historial from './pages/Historial';
 import Usuarios from './pages/admin/Usuarios';
 import Login from './pages/Login'; // Importamos el login real
 import { ROLES } from './constants/roles';
+import Footer from './components/Footer';
 
 function Inicio() {
   const { usuario } = useAuth();
@@ -121,6 +122,12 @@ export default function App() {
             <Route path="*" element={<h4 className="text-center mt-5">🚧 Vista en construcción...</h4>} />
           </Routes>
         </Container>
+        <Container className="mt-4" style={{ minHeight: '80vh' }}>
+          <Routes>
+             {/* ... tus rutas ... */}
+          </Routes>
+        </Container>
+        <Footer />
       </BrowserRouter>
     </AuthProvider>
   );
