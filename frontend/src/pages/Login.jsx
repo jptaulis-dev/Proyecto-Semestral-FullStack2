@@ -15,18 +15,16 @@ export default function Login() {
   // Hacia dónde redirigir después de loguearse exitosamente
   const from = location.state?.from?.pathname || '/';
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Validación 1: Campos vacíos
     if (!email.trim() || !password.trim()) {
       setError('Por favor, ingresa tu correo y contraseña.');
       return;
     }
 
-    // Validación 2: Credenciales correctas
-    const resultado = login(email, password);
+    const resultado = await login(email, password);
     if (resultado.exito) {
       navigate(from, { replace: true });
     } else {
