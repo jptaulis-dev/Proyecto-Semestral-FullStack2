@@ -1,23 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Button, Alert } from 'react-bootstrap';
 import { listarCitas, actualizarCita } from '../../services/citasService';
+import { listarMascotas } from '../../services/mascotasService';
 import { enriquecerCita, ordenarPorFecha } from '../../utils/citasUtils';
 import TablaCitas from '../../components/citas/TablaCitas';
 import FormReagendar from '../../components/citas/FormReagendar';
 
 export default function SolicitudesPendientes() {
-  const [citas, setCitas] = useState(() => listarCitas());
+  const [citas, setCitas] = useState([]);
+  const [mascotas, setMascotas] = useState([]);
   const [reagendando, setReagendando] = useState(null);
   const [mensaje, setMensaje] = useState('');
 
-  const aplicar = (id, cambios, texto) => {
-    actualizarCita(id, cambios);
-    setCitas(listarCitas());
+  const cargarDatos = async () => {
+    const [listaCitas, listaMascotas] = await Promise.all([listarCitas(), listarMascotas()]);
+    setCitas(listaCitas);
+    setMascotas(listaMascotas);
+  };
+
+  useEffect(() => {
+    cargarDatos();
+  }, []);
+
+  const aplicar = async (id, cambios, texto) => {
+    await actualizarCita(id, cambios);
+    await cargarDatos();
     setReagendando(null);
     setMensaje(texto);
   };
 
-  const pendientes = ordenarPorFecha(citas.filter((c) => c.estado === 'pendiente')).map(enriquecerCita);
+  const pendientes = ordenarPorFecha(citas.filter((c) => c.estado === 'pendiente')).map((c) =>
+    enriquecerCita(c, mascotas)
+  );
 
   return (
     <Container className="py-4">

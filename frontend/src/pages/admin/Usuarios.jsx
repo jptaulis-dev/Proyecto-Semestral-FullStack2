@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Table, Badge, Alert } from 'react-bootstrap';
 import { ROLES, ROL_LABEL } from '../../constants/roles';
 import {
@@ -11,12 +11,20 @@ import {
 const FORM_VACIO = { nombre: '', email: '', rol: ROLES.DUENO };
 
 export default function Usuarios() {
-  const [usuarios, setUsuarios] = useState(listarUsuarios);
+  const [usuarios, setUsuarios] = useState([]);
   const [busqueda, setBusqueda] = useState('');
   const [editandoId, setEditandoId] = useState(null);
   const [form, setForm] = useState(FORM_VACIO);
   const [errores, setErrores] = useState({});
   const [mensaje, setMensaje] = useState('');
+
+  const cargarDatos = async () => {
+    setUsuarios(await listarUsuarios());
+  };
+
+  useEffect(() => {
+    cargarDatos();
+  }, []);
 
   const validar = () => {
     const err = {};
@@ -28,21 +36,21 @@ export default function Usuarios() {
     return err;
   };
 
-  const guardar = (e) => {
+  const guardar = async (e) => {
     e.preventDefault();
     const err = validar();
     setErrores(err);
     if (Object.keys(err).length > 0) return;
 
     if (editandoId) {
-      actualizarUsuario(editandoId, {
+      await actualizarUsuario(editandoId, {
         nombre: form.nombre.trim(),
         email: form.email.trim(),
         rol: form.rol,
       });
       setMensaje('Usuario actualizado correctamente.');
     } else {
-      crearUsuario({
+      await crearUsuario({
         nombre: form.nombre.trim(),
         email: form.email.trim(),
         rol: form.rol,
@@ -50,7 +58,7 @@ export default function Usuarios() {
       setMensaje('Nuevo usuario creado en el sistema.');
     }
 
-    setUsuarios(listarUsuarios());
+    await cargarDatos();
     setEditandoId(null);
     setForm(FORM_VACIO);
   };
@@ -61,9 +69,9 @@ export default function Usuarios() {
     setForm({ nombre: u.nombre, email: u.email, rol: u.rol });
   };
 
-  const cambiarEstado = (id) => {
-    alternarEstadoUsuario(id);
-    setUsuarios(listarUsuarios());
+  const cambiarEstado = async (id) => {
+    await alternarEstadoUsuario(id);
+    await cargarDatos();
     setMensaje('Estado del usuario actualizado.');
   };
 

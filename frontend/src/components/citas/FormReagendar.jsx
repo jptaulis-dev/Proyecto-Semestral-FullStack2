@@ -5,15 +5,21 @@ import { listarCitas } from '../../services/citasService';
 
 export default function FormReagendar({ cita, onGuardar, onCancelar }) {
   const [fecha, setFecha] = useState(cita.fecha);
-  const [hora, setHora] = useState(cita.hora);
+  const [hora, setHora] = useState(cita.hora ? String(cita.hora).slice(0, 5) : HORAS[0]);
   const [error, setError] = useState('');
 
-  const guardar = (e) => {
+  const guardar = async (e) => {
     e.preventDefault();
     if (!fecha || fecha < hoy()) return setError('Elige una fecha válida (hoy o posterior)');
     if (!hora) return setError('Elige una hora');
-    const ocupada = listarCitas().some(
-      (c) => c.id !== cita.id && c.fecha === fecha && c.hora === hora && c.estado !== 'cancelada'
+
+    const todas = await listarCitas();
+    const ocupada = todas.some(
+      (c) =>
+        c.id !== cita.id &&
+        c.fecha === fecha &&
+        String(c.hora).slice(0, 5) === hora &&
+        c.estado !== 'cancelada'
     );
     if (ocupada) return setError('Ese horario ya está ocupado');
     return onGuardar({ fecha, hora });
@@ -21,10 +27,20 @@ export default function FormReagendar({ cita, onGuardar, onCancelar }) {
 
   return (
     <Form onSubmit={guardar} noValidate className="d-flex flex-column flex-md-row gap-2 align-items-md-center">
-      <Form.Control type="date" size="sm" min={hoy()} value={fecha} aria-label="Nueva fecha"
-        onChange={(e) => { setFecha(e.target.value); setError(''); }} />
-      <Form.Select size="sm" value={hora} aria-label="Nueva hora"
-        onChange={(e) => { setHora(e.target.value); setError(''); }}>
+      <Form.Control
+        type="date"
+        size="sm"
+        min={hoy()}
+        value={fecha}
+        aria-label="Nueva fecha"
+        onChange={(e) => { setFecha(e.target.value); setError(''); }}
+      />
+      <Form.Select
+        size="sm"
+        value={hora}
+        aria-label="Nueva hora"
+        onChange={(e) => { setHora(e.target.value); setError(''); }}
+      >
         {HORAS.map((h) => <option key={h} value={h}>{h}</option>)}
       </Form.Select>
       <Button type="submit" size="sm">Guardar</Button>

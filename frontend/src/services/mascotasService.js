@@ -1,57 +1,61 @@
-import { mascotas as mascotasIniciales } from '../data/mascotas';
-import { duenos } from '../data/duenos';
+import { apiFetch } from './api';
 
-const CLAVE_MASCOTAS = 'vsm_mascotas';
-
-function cargarMascotas() {
-  try {
-    const guardado = localStorage.getItem(CLAVE_MASCOTAS);
-    if (guardado) return JSON.parse(guardado);
-  } catch {
-    // Si falla localStorage, usa datos iniciales
-  }
-  return [...mascotasIniciales];
+export async function listarDuenos() {
+  return apiFetch('/duenos');
 }
 
-function guardarMascotas(lista) {
+export async function obtenerDueno(id) {
   try {
-    localStorage.setItem(CLAVE_MASCOTAS, JSON.stringify(lista));
+    return await apiFetch(`/duenos/${id}`);
   } catch {
-    // Ignorar errores de almacenamiento
+    return null;
   }
 }
 
-export const listarDuenos = () => [...duenos];
+export async function obtenerDuenoPorUsuario(usuarioId) {
+  try {
+    return await apiFetch(`/duenos/por-usuario/${usuarioId}`);
+  } catch {
+    return null;
+  }
+}
 
-export const obtenerDueno = (id) =>
-  duenos.find((d) => d.id === Number(id)) || null;
+export async function listarMascotas() {
+  return apiFetch('/mascotas');
+}
 
-export const obtenerDuenoPorUsuario = (usuarioId) =>
-  duenos.find((d) => d.usuarioId === usuarioId || d.usuariosId === usuarioId) || null;
+export async function listarMascotasDeDueno(duenoId) {
+  const todas = await listarMascotas();
+  return todas.filter((m) => Number(m.duenoId) === Number(duenoId));
+}
 
-export const listarMascotas = () => cargarMascotas();
+export async function obtenerMascota(id) {
+  try {
+    return await apiFetch(`/mascotas/${id}`);
+  } catch {
+    return null;
+  }
+}
 
-export const listarMascotasDeDueno = (duenoId) =>
-  cargarMascotas().filter((m) => m.duenoId === Number(duenoId));
+export async function crearMascota(datos) {
+  return apiFetch('/mascotas', {
+    method: 'POST',
+    body: JSON.stringify({
+      ...datos,
+      duenoId: Number(datos.duenoId),
+    }),
+  });
+}
 
-export const obtenerMascota = (id) =>
-  cargarMascotas().find((m) => m.id === Number(id)) || null;
-
-export function crearMascota(datos) {
-  const lista = cargarMascotas();
-  const nueva = {
-    ...datos,
-    id: Math.max(0, ...lista.map((m) => m.id)) + 1,
-    duenoId: Number(datos.duenoId),
+export async function actualizarMascota(id, cambios) {
+  const actual = await obtenerMascota(id);
+  const payload = {
+    ...(actual || {}),
+    ...cambios,
+    duenoId: Number(cambios.duenoId ?? actual?.duenoId),
   };
-  guardarMascotas([...lista, nueva]);
-  return nueva;
-}
-
-export function actualizarMascota(id, cambios) {
-  const lista = cargarMascotas().map((m) =>
-    m.id === Number(id) ? { ...m, ...cambios, duenoId: Number(cambios.duenoId ?? m.duenoId) } : m
-  );
-  guardarMascotas(lista);
-  return lista.find((m) => m.id === Number(id)) || null;
+  return apiFetch(`/mascotas/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
 }

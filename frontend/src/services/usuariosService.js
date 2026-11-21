@@ -1,48 +1,37 @@
-import { usuariosIniciales } from '../data/usuarios';
+import { apiFetch } from './api';
 
-const CLAVE_USUARIOS = 'vsm_usuarios';
+export async function listarUsuarios() {
+  return apiFetch('/usuarios');
+}
 
-function cargar() {
-  try {
-    const guardado = localStorage.getItem(CLAVE_USUARIOS);
-    if (guardado) return JSON.parse(guardado);
-  } catch {
-    // Usa datos iniciales
+export async function crearUsuario(datos) {
+  return apiFetch('/usuarios', {
+    method: 'POST',
+    body: JSON.stringify({
+      nombre: datos.nombre,
+      email: datos.email,
+      password: datos.password || 'password123',
+      rol: datos.rol,
+      activo: datos.activo ?? true,
+    }),
+  });
+}
+
+export async function actualizarUsuario(id, cambios) {
+  return apiFetch(`/usuarios/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(cambios),
+  });
+}
+
+export async function alternarEstadoUsuario(id) {
+  const usuarios = await listarUsuarios();
+  const actual = usuarios.find((u) => Number(u.id) === Number(id));
+  if (!actual) {
+    throw new Error('Usuario no encontrado');
   }
-  return [...usuariosIniciales];
-}
-
-function guardar(lista) {
-  try {
-    localStorage.setItem(CLAVE_USUARIOS, JSON.stringify(lista));
-  } catch {
-    // Ignorar errores de almacenamiento
-  }
-}
-
-export const listarUsuarios = () => cargar();
-
-export function crearUsuario(datos) {
-  const lista = cargar();
-  const nuevo = {
-    ...datos,
-    id: Math.max(0, ...lista.map((u) => u.id)) + 1,
-    activo: true,
-  };
-  guardar([...lista, nuevo]);
-  return nuevo;
-}
-
-export function actualizarUsuario(id, cambios) {
-  const lista = cargar().map((u) => (u.id === Number(id) ? { ...u, ...cambios } : u));
-  guardar(lista);
-  return lista.find((u) => u.id === Number(id)) || null;
-}
-
-export function alternarEstadoUsuario(id) {
-  const lista = cargar().map((u) =>
-    u.id === Number(id) ? { ...u, activo: !u.activo } : u
-  );
-  guardar(lista);
-  return lista.find((u) => u.id === Number(id)) || null;
+  return actualizarUsuario(id, {
+    ...actual,
+    activo: !actual.activo,
+  });
 }

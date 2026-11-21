@@ -4,7 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import AppNavbar from './components/AppNavbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import MapaUbicacion from './components/MapaUbicacion';
-import SolicitarCita from './pages/dueno/Solicitarcita';
+import SolicitarCita from './pages/dueno/SolicitarCita';
 import MisCitas from './pages/dueno/MisCitas';
 import SolicitudesPendientes from './pages/recepcion/SolicitudesPendientes';
 import Agenda from './pages/recepcion/Agenda';
@@ -120,11 +120,6 @@ export default function App() {
               element={<h3 className="text-danger mt-5 text-center">⛔ No tienes permisos para ver esta sección.</h3>}
             />
             <Route path="*" element={<h4 className="text-center mt-5">🚧 Vista en construcción...</h4>} />
-          </Routes>
-        </Container>
-        <Container className="mt-4" style={{ minHeight: '80vh' }}>
-          <Routes>
-             {/* ... tus rutas ... */}
           </Routes>
         </Container>
         <Footer />

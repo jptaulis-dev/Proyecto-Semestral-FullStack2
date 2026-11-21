@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Badge, Alert, Table } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
 import { ROLES } from '../constants/roles';
@@ -6,7 +6,6 @@ import {
   listarMascotas,
   listarMascotasDeDueno,
   obtenerDuenoPorUsuario,
-  obtenerMascota,
 } from '../services/mascotasService';
 import {
   listarHistorial,
@@ -22,27 +21,15 @@ const VETERINARIOS = ['Dra. Carolina Reyes', 'Dr. Andrés Molina', 'Dr. Felipe A
 export default function Historial() {
   const { usuario } = useAuth();
   const esPersonal = usuario.rol === ROLES.RECEPCION || usuario.rol === ROLES.ADMIN;
-  const duenoActual = obtenerDuenoPorUsuario(usuario.id);
 
-  const mascotasDisponibles = esPersonal
-    ? listarMascotas()
-    : duenoActual
-    ? listarMascotasDeDueno(duenoActual.id)
-    : [];
-
-  const obtenerRegistrosSegunRol = () => {
-    if (esPersonal) return listarHistorial();
-    const ids = mascotasDisponibles.map((m) => m.id);
-    return listarHistorialDeMascotas(ids);
-  };
-
-  const [registros, setRegistros] = useState(obtenerRegistrosSegunRol);
+  const [mascotasDisponibles, setMascotasDisponibles] = useState([]);
+  const [registros, setRegistros] = useState([]);
   const [filtroMascota, setFiltroMascota] = useState('TODAS');
   const [filtroTipo, setFiltroTipo] = useState('TODOS');
   const [mensaje, setMensaje] = useState('');
 
   const [form, setForm] = useState({
-    mascotaId: mascotasDisponibles[0]?.id ? String(mascotasDisponibles[0].id) : '',
+    mascotaId: '',
     veterinario: VETERINARIOS[0],
     tipo: 'Consulta general',
     diagnostico: '',
@@ -52,6 +39,33 @@ export default function Historial() {
   const [errores, setErrores] = useState({});
 
   const medicamentos = listarMedicamentos();
+
+  const cargarDatos = async () => {
+    let mascotas = [];
+    if (esPersonal) {
+      mascotas = await listarMascotas();
+    } else {
+      const dueno = await obtenerDuenoPorUsuario(usuario.id);
+      mascotas = dueno ? await listarMascotasDeDueno(dueno.id) : [];
+    }
+    setMascotasDisponibles(mascotas);
+
+    if (esPersonal) {
+      setRegistros(await listarHistorial());
+    } else {
+      const ids = mascotas.map((m) => m.id);
+      setRegistros(await listarHistorialDeMascotas(ids));
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      mascotaId: prev.mascotaId || (mascotas[0]?.id ? String(mascotas[0].id) : ''),
+    }));
+  };
+
+  useEffect(() => {
+    cargarDatos();
+  }, [usuario.id]);
 
   const validar = () => {
     const err = {};
@@ -65,32 +79,31 @@ export default function Historial() {
     return err;
   };
 
-  const registrarAtencion = (e) => {
+  const registrarAtencion = async (e) => {
     e.preventDefault();
     const err = validar();
     setErrores(err);
     if (Object.keys(err).length > 0) return;
 
-    crearRegistroHistorial({
+    await crearRegistroHistorial({
       ...form,
       fecha: hoy(),
       diagnostico: form.diagnostico.trim(),
     });
 
-    setRegistros(obtenerRegistrosSegunRol());
+    await cargarDatos();
     setForm({ ...form, diagnostico: '', proximoControl: '' });
     setMensaje('Ficha clínica y receta actualizadas digitalmente.');
   };
 
   const registrosFiltrados = registros.filter((r) => {
-    const coincideMascota = filtroMascota === 'TODAS' || r.mascotaId === Number(filtroMascota);
+    const coincideMascota = filtroMascota === 'TODAS' || Number(r.mascotaId) === Number(filtroMascota);
     const coincideTipo = filtroTipo === 'TODOS' || r.tipo === filtroTipo;
     return coincideMascota && coincideTipo;
   });
 
-  // Avisos de vacunas o controles próximos a vencer
   const alertasVencimiento = registrosFiltrados.filter(
-    (r) => r.proximoControl && r.proximoControl >= '2026-10-01' && r.proximoControl <= '2026-11-15'
+    (r) => r.proximoControl && r.proximoControl >= '2026-10-01' && r.proximoControl <= '2026-12-31'
   );
 
   return (
@@ -107,12 +120,15 @@ export default function Historial() {
         <Alert variant="warning" className="shadow-sm">
           <strong>🔔 Recordatorio de próximos controles y vacunas:</strong>
           <ul className="mb-0 mt-1 small">
-            {alertasVencimiento.map((a) => (
-              <li key={a.id}>
-                <strong>{obtenerMascota(a.mascotaId)?.nombre}:</strong> Próximo control / refuerzo programado para el{' '}
-                <strong>{a.proximoControl}</strong> ({a.tipo}).
-              </li>
-            ))}
+            {alertasVencimiento.map((a) => {
+              const mascota = mascotasDisponibles.find((m) => Number(m.id) === Number(a.mascotaId));
+              return (
+                <li key={a.id}>
+                  <strong>{mascota?.nombre ?? 'Paciente'}:</strong> Próximo control / refuerzo programado para el{' '}
+                  <strong>{a.proximoControl}</strong> ({a.tipo}).
+                </li>
+              );
+            })}
           </ul>
         </Alert>
       )}
@@ -158,7 +174,7 @@ export default function Historial() {
                   </thead>
                   <tbody>
                     {registrosFiltrados.map((r) => {
-                      const mascota = obtenerMascota(r.mascotaId);
+                      const mascota = mascotasDisponibles.find((m) => Number(m.id) === Number(r.mascotaId));
                       const med = obtenerMedicamento(r.medicamentoCodigo);
                       return (
                         <tr key={r.id}>

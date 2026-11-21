@@ -74,26 +74,46 @@ public class SecurityConfig {
     ) {
         return args -> {
             if (usuarioRepository.count() == 0) {
-                Usuario u1 = crearUsuario(usuarioRepository, encoder, "Juan Pablo Taulis", "admin@juanpablo.cl", "password123", "ADMIN");
-                Usuario u2 = crearUsuario(usuarioRepository, encoder, "Marcela Soto", "recepcion@sanmarcos.cl", "password123", "RECEPCION");
-                Usuario u3 = crearUsuario(usuarioRepository, encoder, "Alejandro Chandia", "alej.chandia@duocuc.cl", "password123", "DUENO");
+                crearUsuario(usuarioRepository, encoder, "Juan Pablo Taulis", "admin@juanpablo.cl", "password123", "ADMIN");
+                crearUsuario(usuarioRepository, encoder, "Marcela Soto", "recepcion@sanmarcos.cl", "password123", "RECEPCION");
+                crearUsuario(usuarioRepository, encoder, "Alejandro Chandia", "alej.chandia@duocuc.cl", "password123", "DUENO");
                 crearUsuario(usuarioRepository, encoder, "Dra. Carolina Reyes", "creyes@sanmarcos.cl", "password123", "RECEPCION");
-                Usuario u5 = crearUsuario(usuarioRepository, encoder, "María González", "maria.gonzalez@correo.cl", "password123", "DUENO");
+                crearUsuario(usuarioRepository, encoder, "María González", "maria.gonzalez@correo.cl", "password123", "DUENO");
+            }
 
-                Dueno d1 = crearDueno(duenoRepository, u3.getId(), "Alejandro Chandia", "+56 9 1111 1111");
-                Dueno d2 = crearDueno(duenoRepository, u5.getId(), "María González", "+56 9 2222 2222");
+            Long idUsuarioAlejandro = usuarioRepository.findByEmail("alej.chandia@duocuc.cl")
+                    .map(Usuario::getId)
+                    .orElse(3L);
+            Long idUsuarioMaria = usuarioRepository.findByEmail("maria.gonzalez@correo.cl")
+                    .map(Usuario::getId)
+                    .orElse(5L);
 
+            Dueno d1 = duenoRepository.findAll().stream()
+                    .filter(d -> "+56 9 1111 1111".equals(d.getTelefono()))
+                    .findFirst()
+                    .orElseGet(() -> crearDueno(duenoRepository, idUsuarioAlejandro, "Alejandro Chandia", "+56 9 1111 1111"));
+
+            Dueno d2 = duenoRepository.findAll().stream()
+                    .filter(d -> "+56 9 2222 2222".equals(d.getTelefono()))
+                    .findFirst()
+                    .orElseGet(() -> crearDueno(duenoRepository, idUsuarioMaria, "María González", "+56 9 2222 2222"));
+
+            if (mascotaRepository.count() == 0) {
                 Mascota m1 = crearMascota(mascotaRepository, d1.getId(), "Firulais", "perro", "macho", LocalDate.of(2019, 3, 20), "Mestizo");
                 Mascota m2 = crearMascota(mascotaRepository, d1.getId(), "Luna", "gato", "hembra", LocalDate.of(2021, 7, 15), "Doméstico");
                 Mascota m3 = crearMascota(mascotaRepository, d2.getId(), "Rocky", "perro", "macho", LocalDate.of(2020, 11, 2), "Terrier");
                 crearMascota(mascotaRepository, d2.getId(), "Copito", "conejo", "hembra", LocalDate.of(2023, 1, 10), "Enano");
 
-                crearCita(citaRepository, m1.getId(), d1.getId(), "SV001", LocalDate.of(2026, 10, 20), LocalTime.of(10, 0), "Control general", "confirmada");
-                crearCita(citaRepository, m2.getId(), d1.getId(), "VA003", LocalDate.of(2026, 10, 22), LocalTime.of(11, 30), "Refuerzo anual", "pendiente");
-                crearCita(citaRepository, m3.getId(), d2.getId(), "SV001", LocalDate.of(2026, 10, 21), LocalTime.of(9, 0), "Cojea de una pata", "reagendada");
+                if (citaRepository.count() == 0) {
+                    crearCita(citaRepository, m1.getId(), d1.getId(), "SV001", LocalDate.of(2026, 10, 20), LocalTime.of(10, 0), "Control general", "confirmada");
+                    crearCita(citaRepository, m2.getId(), d1.getId(), "VA003", LocalDate.of(2026, 10, 22), LocalTime.of(11, 30), "Refuerzo anual", "pendiente");
+                    crearCita(citaRepository, m3.getId(), d2.getId(), "SV001", LocalDate.of(2026, 10, 21), LocalTime.of(9, 0), "Cojea de una pata", "reagendada");
+                }
 
-                crearHistorial(historialRepository, m1.getId(), LocalDate.of(2026, 9, 10), "Dra. Carolina Reyes", "Vacunación", "Paciente sano. Refuerzo anual.", "Vacuna séxtuple", "ME019", LocalDate.of(2026, 11, 28), "");
-                crearHistorial(historialRepository, m2.getId(), LocalDate.of(2026, 8, 20), "Dra. Carolina Reyes", "Vacunación", "Control felino e inmunización sin reacciones.", "Triple felina", "ME020", LocalDate.of(2026, 11, 22), "");
+                if (historialRepository.count() == 0) {
+                    crearHistorial(historialRepository, m1.getId(), LocalDate.of(2026, 9, 10), "Dra. Carolina Reyes", "Vacunación", "Paciente sano. Refuerzo anual.", "Vacuna séxtuple", "ME019", LocalDate.of(2026, 11, 28), "");
+                    crearHistorial(historialRepository, m2.getId(), LocalDate.of(2026, 8, 20), "Dra. Carolina Reyes", "Vacunación", "Control felino e inmunización sin reacciones.", "Triple felina", "ME020", LocalDate.of(2026, 11, 22), "");
+                }
             }
         };
     }
@@ -166,5 +186,19 @@ public class SecurityConfig {
                     .bearerFormat("JWT")
                 )
             );
+    }
+
+    @Bean
+    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+        org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
+        configuration.setAllowedOrigins(java.util.List.of("http://localhost:5173", "http://127.0.0.1:5173"));
+        configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(java.util.List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source =
+                new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
