@@ -1,109 +1,143 @@
-# 🐾 Veterinaria San Marcos - Proyecto Semestral FullStack
+# Veterinaria San Marcos — Proyecto Semestral FullStack
 
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
-![Testing](https://img.shields.io/badge/Testing-Karma%20%7C%20Jasmine-8A2BE2?style=for-the-badge)
-
-Aplicación web desarrollada como **Single Page Application (SPA)** para la gestión y agendamiento de citas de una clínica veterinaria. Este repositorio contiene el frontend interactivo construido con React y la documentación oficial del proyecto.
-
----
-
-## 🚀 Tecnologías Utilizadas
-
-*   **Core:** React.js y React Router DOM (para navegación SPA).
-*   **Build Tool:** Vite (empaquetador ultrarrápido).
-*   **UI & Estilos:** Bootstrap y React-Bootstrap (diseño 100% responsivo).
-*   **Mapas:** Leaflet y React-Leaflet (mapa interactivo con geolocalización).
-*   **Testing:** Karma y Jasmine (Suite de 82 pruebas unitarias automatizadas).
-
----
-
-## 📂 Estructura del Repositorio
-
-El proyecto está dividido de forma modular para separar la documentación académica de la lógica de negocio y las vistas del cliente:
-
-```text
-Proyecto-Semestral-FullStack2/
-├── documentacion/                 # Documentación del proyecto (Word/Excel)
-│   ├── captura/                   # Capturas de pantalla y evidencias visuales
-│   └── 09_Plantilla_Documento_Cobertura_Testing_EP2.docx
-├── frontend/                      # Aplicación React
-│   ├── src/                       
-│   │   ├── components/            # Componentes reutilizables (Tablas, Navbar, Badges)
-│   │   ├── constants/             # Constantes globales de la aplicación (Roles RBAC)
-│   │   ├── context/               # Contexto de autenticación y sesión
-│   │   ├── data/                  # Datos locales y mocks iniciales
-│   │   ├── pages/                 # Vistas protegidas según rol de usuario
-│   │   ├── services/              # Lógica de negocio (CRUD simulado con localStorage)
-│   │   ├── test/                  # Suite de 82 pruebas unitarias
-│   │   └── utils/                 # Utilidades de formato (Fechas, Horarios)
-│   ├── karma.conf.cjs             # Configuración del entorno de pruebas
-│   ├── package.json               # Dependencias del frontend
-│   └── vite.config.js             # Configuración de Vite
-└── README.md                      # Este documento
+Aplicación web Full Stack para la gestión y agendamiento de citas de una clínica veterinaria.
 
 ## Tecnologías
 
-- React y React Router
-- Vite
-- Bootstrap y React-Bootstrap
-- Karma y Jasmine para las pruebas
+- Frontend: React, React Router, Vite, Bootstrap y React-Bootstrap.
+- Backend: Java 17, Spring Boot 4, Spring Data JPA, Spring Security y JWT.
+- Persistencia: H2 embebida para desarrollo local; soporte para MySQL mediante configuración JDBC.
+- Documentación API: SpringDoc OpenAPI y Swagger UI.
+- Pruebas frontend: Karma, Jasmine y Testing Library.
+- Mapas: Leaflet y React-Leaflet.
+
+## Estructura del proyecto
+
+```text
+Proyecto-Semestral-FullStack2/
+├── backend/
+│   ├── .mvn/wrapper/                  # Configuración del Maven Wrapper
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/cl/duoc/veterinaria_backend/
+│   │   │   │   ├── controller/       # Endpoints REST
+│   │   │   │   ├── model/            # Entidades JPA
+│   │   │   │   ├── repository/       # Repositorios Spring Data JPA
+│   │   │   │   ├── security/         # JWT y configuración de seguridad
+│   │   │   │   └── service/         # Reglas de negocio
+│   │   │   └── resources/
+│   │   │       └── application.properties
+│   │   └── test/java/cl/duoc/veterinaria_backend/
+│   ├── mvnw                          # Maven Wrapper para Linux/macOS
+│   ├── mvnw.cmd                      # Maven Wrapper para Windows
+│   └── pom.xml                       # Dependencias y configuración Maven
+├── frontend/
+│   ├── src/
+│   │   ├── components/               # Componentes reutilizables
+│   │   │   └── citas/                # Componentes relacionados con citas
+│   │   ├── constants/                # Roles y constantes globales
+│   │   ├── context/                  # Estado y contexto de autenticación
+│   │   ├── data/                     # Catálogos y datos iniciales
+│   │   ├── pages/                    # Vistas de la aplicación
+│   │   │   ├── admin/                # Administración
+│   │   │   ├── dueno/                # Funcionalidades del dueño
+│   │   │   └── recepcion/            # Funcionalidades de recepción
+│   │   ├── services/                 # Clientes HTTP y acceso a la API
+│   │   ├── test/                     # Pruebas Karma/Jasmine
+│   │   └── utils/                    # Utilidades de citas y horarios
+│   ├── karma.conf.cjs                # Configuración de pruebas
+│   ├── package.json                  # Dependencias y scripts npm
+│   ├── vite.config.js                # Configuración de Vite
+│   └── webpack.test.config.cjs       # Configuración de pruebas Webpack
+├── documentacion/
+│   └── captura/                      # Documentos y capturas académicas
+├── .vscode/settings.json             # Integración Maven/Java de VS Code
+├── .gitignore
+└── README.md
+```
 
 ## Requisitos
 
-- Node.js y npm
-- Google Chrome para ejecutar las pruebas con Karma
+- Node.js y npm.
+- Java 17 o superior.
+- Google Chrome para ejecutar las pruebas frontend.
+- Git.
 
-## Instalación y ejecución
+## Instalación
 
-Desde la carpeta del frontend, instala las dependencias y levanta el servidor de desarrollo:
+Instale las dependencias del frontend:
 
 ```bash
 cd frontend
 npm install
-npm run dev
 ```
 
-Vite mostrará en la terminal la dirección local de la aplicación.
+## Ejecución local
 
-## Pruebas
+### Backend
 
-Ejecuta la suite de pruebas desde `frontend/`:
-
-```bash
-npm test
-```
-
-Para mantener las pruebas en modo observación:
-
-```bash
-npm run test:watch
-```
-
-## Compilación
-
-Genera la versión de producción con:
-
-```bash
-npm run build
-```
-
-Los archivos compilados se generan en `frontend/dist/`.
-
-## Backend local
-
-Desde `backend/`, Spring Boot puede iniciarse sin credenciales externas utilizando la base H2 embebida configurada por defecto:
+Desde `backend/`:
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-URLs locales:
+En Windows:
 
-- Frontend: <http://localhost:5173>
+```cmd
+mvnw.cmd spring-boot:run
+```
+
+El backend utiliza una base H2 embebida por defecto, por lo que no requiere configurar MySQL para desarrollo local.
+
 - API: <http://localhost:8080>
 - Swagger UI: <http://localhost:8080/swagger-ui/index.html>
 - OpenAPI: <http://localhost:8080/v3/api-docs>
 
-El servidor H2 se recrea al reiniciar el backend y no modifica una instalación MySQL existente.
+### Frontend
+
+Desde `frontend/`:
+
+```bash
+npm run dev
+```
+
+- Frontend: <http://localhost:5173>
+
+## Configuración de la API
+
+El frontend consume el backend mediante `http://localhost:8080/api`.
+
+El backend debe ejecutarse junto al frontend. Los datos almacenados en H2 se recrean al reiniciar Spring Boot.
+
+## Pruebas frontend
+
+Ejecute las pruebas desde `frontend/`:
+
+```bash
+npm test
+```
+
+Para mantener Karma en modo observación:
+
+```bash
+npm run test:watch
+```
+
+## Compilación frontend
+
+```bash
+cd frontend
+npm run build
+```
+
+El resultado se genera en `frontend/dist/`.
+
+## Compilación backend
+
+```bash
+cd backend
+./mvnw clean compile
+```
+
+Los artefactos generados como `target/`, `dist/`, `coverage/` y `node_modules/` están excluidos del repositorio mediante `.gitignore`.
