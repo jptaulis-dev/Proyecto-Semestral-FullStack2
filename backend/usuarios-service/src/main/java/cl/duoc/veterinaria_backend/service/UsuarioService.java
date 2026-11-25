@@ -34,6 +34,7 @@ public class UsuarioService {
         usuario.setEmail(usuario.getEmail().trim().toLowerCase());
         usuario.setRol(usuario.getRol().trim().toUpperCase());
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        
         return repository.save(usuario);
     }
 
@@ -51,8 +52,13 @@ public class UsuarioService {
         return repository.save(actual);
     }
 
+    
+
     public void eliminar(Long id) {
         Usuario actual = buscar(id);
         repository.delete(actual);
     }
+
+
+    
 }

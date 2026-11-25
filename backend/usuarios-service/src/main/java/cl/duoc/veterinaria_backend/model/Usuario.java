@@ -1,8 +1,11 @@
 package cl.duoc.veterinaria_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+
 
 @Entity
 @Table(name = "usuarios")
@@ -20,7 +23,7 @@ public class Usuario {
     @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "La contraseña es obligatoria")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @NotBlank(message = "El rol es obligatorio")
