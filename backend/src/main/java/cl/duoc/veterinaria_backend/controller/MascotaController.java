@@ -1,7 +1,7 @@
 package cl.duoc.veterinaria_backend.controller;
 
-import cl.duoc.veterinaria_backend.model.Cita;
-import cl.duoc.veterinaria_backend.service.CitaService;
+import cl.duoc.veterinaria_backend.model.Mascota;
+import cl.duoc.veterinaria_backend.service.MascotaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -9,34 +9,34 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/citas")
+@RequestMapping("/api/mascotas")
 @CrossOrigin(origins = "http://localhost:5173")
-public class CitaController {
+public class MascotaController {
 
-    private final CitaService service;
+    private final MascotaService service;
 
-    public CitaController(CitaService service) {
+    public MascotaController(MascotaService service) {
         this.service = service;
     }
 
     @GetMapping
-    public List<Cita> listar() {
+    public List<Mascota> listar() {
         return service.listar();
     }
 
     @GetMapping("/{id}")
-    public Cita buscar(@PathVariable Long id) {
+    public Mascota buscar(@PathVariable Long id) {
         return service.buscar(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Cita crear(@Valid @RequestBody Cita cita) {
-        return service.crear(cita);
+    public Mascota crear(@Valid @RequestBody Mascota mascota) {
+        return service.crear(mascota);
     }
 
     @PutMapping("/{id}")
-    public Cita actualizar(@PathVariable Long id, @Valid @RequestBody Cita cambios) {
+    public Mascota actualizar(@PathVariable Long id, @Valid @RequestBody Mascota cambios) {
         return service.actualizar(id, cambios);
     }
 

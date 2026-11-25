@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Table, Badge, Alert } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
 import { ROLES } from '../constants/roles';
@@ -6,7 +6,6 @@ import {
   listarMascotas,
   listarMascotasDeDueno,
   listarDuenos,
-  obtenerDueno,
   obtenerDuenoPorUsuario,
   crearMascota,
   actualizarMascota,
@@ -17,23 +16,41 @@ const FORM_INICIAL = { nombre: '', especie: 'perro', sexo: 'macho', fechaNacimie
 export default function Mascotas() {
   const { usuario } = useAuth();
   const esPersonalClinica = usuario.rol === ROLES.RECEPCION || usuario.rol === ROLES.ADMIN;
-  const duenoActual = obtenerDuenoPorUsuario(usuario.id);
-  const duenos = listarDuenos();
 
-  const cargarSegunRol = () => {
-    if (esPersonalClinica) return listarMascotas();
-    return duenoActual ? listarMascotasDeDueno(duenoActual.id) : [];
-  };
-
-  const [lista, setLista] = useState(cargarSegunRol);
+  const [duenoActual, setDuenoActual] = useState(null);
+  const [duenos, setDuenos] = useState([]);
+  const [lista, setLista] = useState([]);
   const [busqueda, setBusqueda] = useState('');
   const [editandoId, setEditandoId] = useState(null);
-  const [form, setForm] = useState({
-    ...FORM_INICIAL,
-    duenoId: duenoActual ? String(duenoActual.id) : '1',
-  });
+  const [form, setForm] = useState(FORM_INICIAL);
   const [errores, setErrores] = useState({});
   const [mensaje, setMensaje] = useState('');
+
+  const cargarDatos = async () => {
+    const [listaDuenos, dueno] = await Promise.all([
+      listarDuenos(),
+      obtenerDuenoPorUsuario(usuario.id),
+    ]);
+    setDuenos(listaDuenos);
+    setDuenoActual(dueno);
+
+    if (esPersonalClinica) {
+      setLista(await listarMascotas());
+    } else if (dueno) {
+      setLista(await listarMascotasDeDueno(dueno.id));
+    } else {
+      setLista([]);
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      duenoId: prev.duenoId || (dueno ? String(dueno.id) : listaDuenos[0]?.id ? String(listaDuenos[0].id) : ''),
+    }));
+  };
+
+  useEffect(() => {
+    cargarDatos();
+  }, [usuario.id]);
 
   const validar = () => {
     const err = {};
@@ -48,14 +65,14 @@ export default function Mascotas() {
     return err;
   };
 
-  const guardar = (e) => {
+  const guardar = async (e) => {
     e.preventDefault();
     const err = validar();
     setErrores(err);
     if (Object.keys(err).length > 0) return;
 
     if (editandoId) {
-      actualizarMascota(editandoId, {
+      await actualizarMascota(editandoId, {
         nombre: form.nombre.trim(),
         especie: form.especie,
         sexo: form.sexo,
@@ -64,7 +81,7 @@ export default function Mascotas() {
       });
       setMensaje('Ficha de mascota actualizada correctamente.');
     } else {
-      crearMascota({
+      await crearMascota({
         nombre: form.nombre.trim(),
         especie: form.especie,
         sexo: form.sexo,
@@ -74,9 +91,12 @@ export default function Mascotas() {
       setMensaje('Nueva mascota registrada en el sistema.');
     }
 
-    setLista(cargarSegunRol());
+    await cargarDatos();
     setEditandoId(null);
-    setForm({ ...FORM_INICIAL, duenoId: duenoActual ? String(duenoActual.id) : '1' });
+    setForm({
+      ...FORM_INICIAL,
+      duenoId: duenoActual ? String(duenoActual.id) : duenos[0]?.id ? String(duenos[0].id) : '',
+    });
   };
 
   const iniciarEdicion = (m) => {
@@ -129,24 +149,27 @@ export default function Mascotas() {
                     </tr>
                   </thead>
                   <tbody>
-                    {mascotasFiltradas.map((m) => (
-                      <tr key={m.id}>
-                        <td className="fw-bold">{m.nombre}</td>
-                        <td className="text-capitalize">
-                          <Badge bg="info" text="dark">{m.especie}</Badge>
-                        </td>
-                        <td className="text-capitalize">{m.sexo}</td>
-                        <td>{m.fechaNacimiento}</td>
-                        {esPersonalClinica && <td>{obtenerDueno(m.duenoId)?.nombre ?? 'Sin dueño'}</td>}
-                        {esPersonalClinica && (
-                          <td>
-                            <Button size="sm" variant="outline-primary" onClick={() => iniciarEdicion(m)}>
-                              Editar
-                            </Button>
+                    {mascotasFiltradas.map((m) => {
+                      const dueno = duenos.find((d) => Number(d.id) === Number(m.duenoId));
+                      return (
+                        <tr key={m.id}>
+                          <td className="fw-bold">{m.nombre}</td>
+                          <td className="text-capitalize">
+                            <Badge bg="info" text="dark">{m.especie}</Badge>
                           </td>
-                        )}
-                      </tr>
-                    ))}
+                          <td className="text-capitalize">{m.sexo}</td>
+                          <td>{m.fechaNacimiento}</td>
+                          {esPersonalClinica && <td>{dueno?.nombre ?? 'Sin dueño'}</td>}
+                          {esPersonalClinica && (
+                            <td>
+                              <Button size="sm" variant="outline-primary" onClick={() => iniciarEdicion(m)}>
+                                Editar
+                              </Button>
+                            </td>
+                          )}
+                        </tr>
+                      );
+                    })}
                     {mascotasFiltradas.length === 0 && (
                       <tr>
                         <td colSpan={6} className="text-center text-muted py-3">
@@ -247,7 +270,7 @@ export default function Mascotas() {
                         onClick={() => {
                           setEditandoId(null);
                           setErrores({});
-                          setForm({ ...FORM_INICIAL, duenoId: '1' });
+                          setForm({ ...FORM_INICIAL, duenoId: duenos[0]?.id ? String(duenos[0].id) : '' });
                         }}
                       >
                         Cancelar

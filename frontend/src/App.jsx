@@ -122,11 +122,6 @@ export default function App() {
             <Route path="*" element={<h4 className="text-center mt-5">🚧 Vista en construcción...</h4>} />
           </Routes>
         </Container>
-        <Container className="mt-4" style={{ minHeight: '80vh' }}>
-          <Routes>
-             {/* ... tus rutas ... */}
-          </Routes>
-        </Container>
         <Footer />
       </BrowserRouter>
     </AuthProvider>

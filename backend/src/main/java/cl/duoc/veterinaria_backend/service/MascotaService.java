@@ -5,7 +5,6 @@ import cl.duoc.veterinaria_backend.repository.MascotaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.List;
 
 @Service
@@ -27,22 +26,27 @@ public class MascotaService {
     }
 
     public Mascota crear(Mascota mascota) {
-        mascota.setId(null); 
+        mascota.setId(null);
+        if (mascota.getRaza() == null || mascota.getRaza().isBlank()) {
+            mascota.setRaza("Mestizo");
+        }
         return repository.save(mascota);
     }
 
     public Mascota actualizar(Long id, Mascota cambios) {
         Mascota actual = buscar(id);
+        actual.setDuenoId(cambios.getDuenoId());
         actual.setNombre(cambios.getNombre());
         actual.setEspecie(cambios.getEspecie());
-        actual.setRaza(cambios.getRaza());
-        actual.setEdad(cambios.getEdad());
-        actual.setNombreDueno(cambios.getNombreDueno());
+        actual.setSexo(cambios.getSexo());
+        actual.setFechaNacimiento(cambios.getFechaNacimiento());
+        if (cambios.getRaza() != null && !cambios.getRaza().isBlank()) {
+            actual.setRaza(cambios.getRaza());
+        }
         return repository.save(actual);
     }
 
     public void eliminar(Long id) {
-        Mascota actual = buscar(id);
-        repository.delete(actual);
+        repository.delete(buscar(id));
     }
 }

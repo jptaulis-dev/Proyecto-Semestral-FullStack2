@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Button, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { obtenerDuenoPorUsuario } from '../../services/mascotasService';
+import { obtenerDuenoPorUsuario, listarMascotasDeDueno } from '../../services/mascotasService';
 import { listarCitasDeDueno, actualizarCita } from '../../services/citasService';
 import { enriquecerCita, ordenarPorFecha } from '../../utils/citasUtils';
 import TablaCitas from '../../components/citas/TablaCitas';
@@ -11,18 +11,39 @@ const CANCELABLES = ['pendiente', 'confirmada', 'reagendada'];
 
 export default function MisCitas() {
   const { usuario } = useAuth();
-  const dueno = obtenerDuenoPorUsuario(usuario.id);
-  const [citas, setCitas] = useState(() => (dueno ? listarCitasDeDueno(dueno.id) : []));
+  const [dueno, setDueno] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [citas, setCitas] = useState([]);
+  const [mascotas, setMascotas] = useState([]);
 
-  if (!dueno) return <Alert variant="warning" className="m-3">No se encontró tu ficha de dueño.</Alert>;
-
-  const cancelar = (id) => {
-    if (!window.confirm('¿Quieres cancelar esta cita?')) return;
-    actualizarCita(id, { estado: 'cancelada' });
-    setCitas(listarCitasDeDueno(dueno.id));
+  const cargarDatos = async () => {
+    const duenoData = await obtenerDuenoPorUsuario(usuario.id);
+    setDueno(duenoData);
+    if (duenoData) {
+      const [listaCitas, listaMascotas] = await Promise.all([
+        listarCitasDeDueno(duenoData.id),
+        listarMascotasDeDueno(duenoData.id),
+      ]);
+      setCitas(listaCitas);
+      setMascotas(listaMascotas);
+    }
+    setCargando(false);
   };
 
-  const filas = ordenarPorFecha(citas).map(enriquecerCita);
+  useEffect(() => {
+    cargarDatos();
+  }, [usuario.id]);
+
+  if (cargando) return <Container className="py-4"><p className="text-muted">Cargando citas...</p></Container>;
+  if (!dueno) return <Alert variant="warning" className="m-3">No se encontró tu ficha de dueño.</Alert>;
+
+  const cancelar = async (id) => {
+    if (!window.confirm('¿Quieres cancelar esta cita?')) return;
+    await actualizarCita(id, { estado: 'cancelada' });
+    await cargarDatos();
+  };
+
+  const filas = ordenarPorFecha(citas).map((c) => enriquecerCita(c, mascotas));
 
   return (
     <Container className="py-4">

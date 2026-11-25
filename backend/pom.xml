@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>cl.duoc</groupId>
-	<artifactId>veterinaria-backend</artifactId>
+	<artifactId>usuarios-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>usuarios-service</name>
+	<description>Servicio de usuarios y autenticación (JWT)</description>
 	<url/>
 	<licenses>
 		<license/>

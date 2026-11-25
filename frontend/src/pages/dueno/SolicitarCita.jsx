@@ -1,12 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { obtenerDuenoPorUsuario, listarMascotasDeDueno, obtenerMascota } from '../../services/mascotasService';
+import { obtenerDuenoPorUsuario, listarMascotasDeDueno } from '../../services/mascotasService';
 import { serviciosParaMascota, obtenerServicio } from '../../services/catalogoService';
 import { crearCita, listarCitas } from '../../services/citasService';
 
-// Horario simulado (el caso no lo indica): bloques de 30 min entre 09:00 y 17:30
 const HORAS = Array.from({ length: 18 }, (_, i) => {
   const min = 9 * 60 + i * 30;
   return `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;
@@ -18,23 +17,37 @@ const FORM_VACIO = { mascotaId: '', servicioCodigo: '', fecha: '', hora: '', mot
 export default function SolicitarCita() {
   const { usuario } = useAuth();
   const navigate = useNavigate();
-  const dueno = obtenerDuenoPorUsuario(usuario.id);
-  const misMascotas = dueno ? listarMascotasDeDueno(dueno.id) : [];
 
+  const [dueno, setDueno] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [misMascotas, setMisMascotas] = useState([]);
   const [form, setForm] = useState(FORM_VACIO);
   const [errores, setErrores] = useState({});
 
-  const mascota = form.mascotaId ? obtenerMascota(Number(form.mascotaId)) : null;
+  useEffect(() => {
+    async function cargar() {
+      const duenoData = await obtenerDuenoPorUsuario(usuario.id);
+      setDueno(duenoData);
+      if (duenoData) {
+        setMisMascotas(await listarMascotasDeDueno(duenoData.id));
+      }
+      setCargando(false);
+    }
+    cargar();
+  }, [usuario.id]);
+
+  const mascota = form.mascotaId
+    ? misMascotas.find((m) => Number(m.id) === Number(form.mascotaId)) || null
+    : null;
   const opcionesServicio = mascota ? serviciosParaMascota(mascota) : [];
   const servicio = form.servicioCodigo ? obtenerServicio(form.servicioCodigo) : null;
 
   const cambiar = (e) => {
     const { name, value } = e.target;
-    // Al cambiar de mascota se reinicia el servicio, porque depende de la especie
     setForm((f) => ({ ...f, [name]: value, ...(name === 'mascotaId' ? { servicioCodigo: '' } : {}) }));
   };
 
-  const validar = () => {
+  const validar = async () => {
     const err = {};
     if (!form.mascotaId) err.mascotaId = 'Selecciona una mascota';
     if (!form.servicioCodigo) err.servicioCodigo = 'Selecciona un servicio';
@@ -43,20 +56,25 @@ export default function SolicitarCita() {
     if (!form.hora) err.hora = 'Selecciona una hora';
     if (form.motivo.trim().length < 5) err.motivo = 'Describe el motivo (mínimo 5 caracteres)';
     if (!err.fecha && !err.hora) {
-      const ocupada = listarCitas().some(
-        (c) => c.fecha === form.fecha && c.hora === form.hora && c.estado !== 'cancelada'
+      const todas = await listarCitas();
+      const ocupada = todas.some(
+        (c) =>
+          c.fecha === form.fecha &&
+          String(c.hora).slice(0, 5) === form.hora &&
+          c.estado !== 'cancelada'
       );
       if (ocupada) err.hora = 'Ese horario ya está ocupado, elige otro';
     }
     return err;
   };
 
-  const enviar = (e) => {
+  const enviar = async (e) => {
     e.preventDefault();
-    const err = validar();
+    const err = await validar();
     setErrores(err);
     if (Object.keys(err).length > 0) return;
-    crearCita({
+
+    await crearCita({
       mascotaId: Number(form.mascotaId),
       duenoId: dueno.id,
       servicioCodigo: form.servicioCodigo,
@@ -67,6 +85,7 @@ export default function SolicitarCita() {
     navigate('/mis-citas');
   };
 
+  if (cargando) return <Container className="py-4"><p className="text-muted">Cargando formulario...</p></Container>;
   if (!dueno) return <Alert variant="warning" className="m-3">No se encontró tu ficha de dueño.</Alert>;
 
   return (
@@ -86,8 +105,13 @@ export default function SolicitarCita() {
 
         <Form.Group className="mb-3" controlId="servicioCodigo">
           <Form.Label>Servicio</Form.Label>
-          <Form.Select name="servicioCodigo" value={form.servicioCodigo} onChange={cambiar}
-            disabled={!mascota} isInvalid={!!errores.servicioCodigo}>
+          <Form.Select
+            name="servicioCodigo"
+            value={form.servicioCodigo}
+            onChange={cambiar}
+            disabled={!mascota}
+            isInvalid={!!errores.servicioCodigo}
+          >
             <option value="">{mascota ? 'Selecciona...' : 'Primero elige una mascota'}</option>
             {opcionesServicio.map((s) => (
               <option key={s.codigo} value={s.codigo}>{s.categoria} - {s.nombre}</option>
@@ -106,8 +130,14 @@ export default function SolicitarCita() {
         <div className="row">
           <Form.Group className="col-12 col-md-6 mb-3" controlId="fecha">
             <Form.Label>Fecha</Form.Label>
-            <Form.Control type="date" name="fecha" min={hoy()} value={form.fecha}
-              onChange={cambiar} isInvalid={!!errores.fecha} />
+            <Form.Control
+              type="date"
+              name="fecha"
+              min={hoy()}
+              value={form.fecha}
+              onChange={cambiar}
+              isInvalid={!!errores.fecha}
+            />
             <Form.Control.Feedback type="invalid">{errores.fecha}</Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="col-12 col-md-6 mb-3" controlId="hora">
@@ -122,8 +152,14 @@ export default function SolicitarCita() {
 
         <Form.Group className="mb-3" controlId="motivo">
           <Form.Label>Motivo de la consulta</Form.Label>
-          <Form.Control as="textarea" rows={3} name="motivo" value={form.motivo}
-            onChange={cambiar} isInvalid={!!errores.motivo} />
+          <Form.Control
+            as="textarea"
+            rows={3}
+            name="motivo"
+            value={form.motivo}
+            onChange={cambiar}
+            isInvalid={!!errores.motivo}
+          />
           <Form.Control.Feedback type="invalid">{errores.motivo}</Form.Control.Feedback>
         </Form.Group>
 

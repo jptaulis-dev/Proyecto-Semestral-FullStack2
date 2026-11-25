@@ -19,11 +19,18 @@ public class Historial {
     @NotNull(message = "La fecha es obligatoria")
     private LocalDate fecha;
 
+    private String veterinario = "";
+
+    private String tipo = "Consulta general";
+
     @NotBlank(message = "El diagnóstico es obligatorio")
     private String diagnostico;
 
-    @NotBlank(message = "El tratamiento es obligatorio")
-    private String tratamiento;
+    private String tratamiento = "";
+
+    private String medicamentoCodigo;
+
+    private LocalDate proximoControl;
 
     private String observaciones = "";
 
@@ -38,11 +45,23 @@ public class Historial {
     public LocalDate getFecha() { return fecha; }
     public void setFecha(LocalDate fecha) { this.fecha = fecha; }
 
+    public String getVeterinario() { return veterinario; }
+    public void setVeterinario(String veterinario) { this.veterinario = veterinario; }
+
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
+
     public String getDiagnostico() { return diagnostico; }
     public void setDiagnostico(String diagnostico) { this.diagnostico = diagnostico; }
 
     public String getTratamiento() { return tratamiento; }
     public void setTratamiento(String tratamiento) { this.tratamiento = tratamiento; }
+
+    public String getMedicamentoCodigo() { return medicamentoCodigo; }
+    public void setMedicamentoCodigo(String medicamentoCodigo) { this.medicamentoCodigo = medicamentoCodigo; }
+
+    public LocalDate getProximoControl() { return proximoControl; }
+    public void setProximoControl(LocalDate proximoControl) { this.proximoControl = proximoControl; }
 
     public String getObservaciones() { return observaciones; }
     public void setObservaciones(String observaciones) { this.observaciones = observaciones; }

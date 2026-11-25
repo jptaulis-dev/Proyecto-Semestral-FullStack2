@@ -1,61 +1,52 @@
-import { citas as citasIniciales } from '../data/citas';
+import { apiFetch } from './api';
 
-const CLAVE = 'vsm_citas';
-
-function cargar() {
-  try {
-    const guardado = localStorage.getItem(CLAVE);
-    if (guardado) return JSON.parse(guardado);
-  } catch {
-    // si el almacenamiento falla, se usan los datos iniciales
-  }
-  return [...citasIniciales];
+export async function listarCitas() {
+  return apiFetch('/citas');
 }
 
-function guardar(lista) {
+export async function listarCitasDeDueno(duenoId) {
+  const todas = await listarCitas();
+  return todas.filter((c) => Number(c.duenoId) === Number(duenoId));
+}
+
+export async function obtenerCita(id) {
   try {
-    localStorage.setItem(CLAVE, JSON.stringify(lista));
+    return await apiFetch(`/citas/${id}`);
   } catch {
-    // sin almacenamiento los cambios solo viven durante la sesión
+    return null;
   }
 }
 
-export const listarCitas = () => cargar();
+export async function crearCita(datos) {
+  return apiFetch('/citas', {
+    method: 'POST',
+    body: JSON.stringify({
+      ...datos,
+      mascotaId: Number(datos.mascotaId),
+      duenoId: Number(datos.duenoId),
+      estado: (datos.estado || 'pendiente').toLowerCase(),
+    }),
+  });
+}
 
-export const listarCitasDeDueno = (duenoId) =>
-  cargar().filter((c) => c.duenoId === duenoId);
-
-export const obtenerCita = (id) => cargar().find((c) => c.id === id) || null;
-
-export function crearCita(datos) {
-  const lista = cargar();
-  const nueva = {
-    ...datos,
-    id: Math.max(0, ...lista.map((c) => c.id)) + 1,
-    estado: 'pendiente',
+export async function actualizarCita(id, cambios) {
+  const actual = await obtenerCita(id);
+  const payload = {
+    ...(actual || {}),
+    ...cambios,
+    ...(cambios.mascotaId !== undefined ? { mascotaId: Number(cambios.mascotaId) } : {}),
+    ...(cambios.duenoId !== undefined ? { duenoId: Number(cambios.duenoId) } : {}),
+    ...(cambios.estado ? { estado: cambios.estado.toLowerCase() } : {}),
   };
-  guardar([...lista, nueva]);
-  return nueva;
+  return apiFetch(`/citas/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
 }
 
-export function actualizarCita(id, cambios) {
-  const lista = cargar().map((c) => (c.id === id ? { ...c, ...cambios } : c));
-  guardar(lista);
-  return lista.find((c) => c.id === id) || null;
-}
-
-export function eliminarCita(id) {
-  const lista = cargar();
-  const quedan = lista.filter((c) => c.id !== id);
-  guardar(quedan);
-  return quedan.length < lista.length;
-}
-
-// Se usa en las pruebas para volver a los datos iniciales
-export function reiniciarCitas() {
-  try {
-    localStorage.removeItem(CLAVE);
-  } catch {
-    // nada que limpiar
-  }
+export async function eliminarCita(id) {
+  await apiFetch(`/citas/${id}`, {
+    method: 'DELETE',
+  });
+  return true;
 }

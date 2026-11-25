@@ -1,26 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Alert, Card } from 'react-bootstrap';
 import { listarCitas, actualizarCita } from '../../services/citasService';
+import { listarMascotas } from '../../services/mascotasService';
 import { enriquecerCita, ordenarPorFecha } from '../../utils/citasUtils';
 import TablaCitas from '../../components/citas/TablaCitas';
 import FormReagendar from '../../components/citas/FormReagendar';
 
 export default function Agenda() {
-  const [citas, setCitas] = useState(() => listarCitas());
+  const [citas, setCitas] = useState([]);
+  const [mascotas, setMascotas] = useState([]);
   const [filtroEstado, setFiltroEstado] = useState('TODOS');
   const [filtroFecha, setFiltroFecha] = useState('');
   const [busqueda, setBusqueda] = useState('');
   const [reagendando, setReagendando] = useState(null);
   const [mensaje, setMensaje] = useState('');
 
-  const aplicarCambio = (id, cambios, texto) => {
-    actualizarCita(id, cambios);
-    setCitas(listarCitas());
+  const cargarDatos = async () => {
+    const [listaCitas, listaMascotas] = await Promise.all([listarCitas(), listarMascotas()]);
+    setCitas(listaCitas);
+    setMascotas(listaMascotas);
+  };
+
+  useEffect(() => {
+    cargarDatos();
+  }, []);
+
+  const aplicarCambio = async (id, cambios, texto) => {
+    await actualizarCita(id, cambios);
+    await cargarDatos();
     setReagendando(null);
     setMensaje(texto);
   };
 
-  const citasEnriquecidas = ordenarPorFecha(citas).map(enriquecerCita);
+  const citasEnriquecidas = ordenarPorFecha(citas).map((c) => enriquecerCita(c, mascotas));
 
   const citasFiltradas = citasEnriquecidas.filter((c) => {
     const coincideEstado = filtroEstado === 'TODOS' || c.estado.toLowerCase() === filtroEstado.toLowerCase();
@@ -50,7 +62,7 @@ export default function Agenda() {
           <Row className="g-3 align-items-end">
             <Col xs={12} md={4}>
               <Form.Group controlId="buscarAgenda">
-                <Form.Label className="small fw-bold">Buscar paciente, servicio o motivo</Form.Label>
+                <Form.Label class="small fw-bold">Buscar paciente, servicio o motivo</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Ej: Firulais, Vacuna, Control..."
