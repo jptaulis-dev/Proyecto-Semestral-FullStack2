@@ -1,4 +1,14 @@
 node_modules/
 node_modules
 
+dist/
+coverage/
 target/
+
+# VS Code local state
+.vscode/*.code-workspace
+
+# Java / Maven
+*.class
+*.jar
+*.war

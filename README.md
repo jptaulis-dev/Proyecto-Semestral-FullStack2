@@ -90,3 +90,20 @@ npm run build
 ```
 
 Los archivos compilados se generan en `frontend/dist/`.
+
+## Backend local
+
+Desde `backend/`, Spring Boot puede iniciarse sin credenciales externas utilizando la base H2 embebida configurada por defecto:
+
+```bash
+./mvnw spring-boot:run
+```
+
+URLs locales:
+
+- Frontend: <http://localhost:5173>
+- API: <http://localhost:8080>
+- Swagger UI: <http://localhost:8080/swagger-ui/index.html>
+- OpenAPI: <http://localhost:8080/v3/api-docs>
+
+El servidor H2 se recrea al reiniciar el backend y no modifica una instalación MySQL existente.
