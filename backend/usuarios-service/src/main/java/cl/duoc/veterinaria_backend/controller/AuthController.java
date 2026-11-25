@@ -52,12 +52,11 @@ public class AuthController {
         Usuario usuario = usuarioRepository.findByEmail(request.email().trim().toLowerCase())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciales inválidas"));
 
-        if (!usuario.isActivo()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario inactivo");
-        }
-
         if (!passwordEncoder.matches(request.password(), usuario.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciales inválidas");
+        }
+        if (!usuario.isActivo()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario inactivo");
         }
 
         String token = jwtService.generarToken(usuario);
