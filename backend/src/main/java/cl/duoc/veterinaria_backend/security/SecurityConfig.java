@@ -82,10 +82,10 @@ public class SecurityConfig {
             }
 
             Long idUsuarioAlejandro = usuarioRepository.findByEmail("alej.chandia@duocuc.cl")
-                    .map(Usuario::getId)
+                    .map(u -> u.getId())
                     .orElse(3L);
             Long idUsuarioMaria = usuarioRepository.findByEmail("maria.gonzalez@correo.cl")
-                    .map(Usuario::getId)
+                    .map(u -> u.getId())
                     .orElse(5L);
 
             Dueno d1 = duenoRepository.findAll().stream()
