@@ -1,17 +1,26 @@
-# Veterinaria San Marcos — Proyecto Semestral FullStack
+# Veterinaria San Marcos — Proyecto Semestral FullStack (EP3)
 
-Aplicación web Full Stack para la gestión y agendamiento de citas de una clínica veterinaria.
+Aplicación web Full Stack para la gestión clínica, fichas de pacientes, historial/vacunación y agendamiento de citas de la clínica **Veterinaria San Marcos**, integrada con autenticación JWT y control de acceso basado en roles (RBAC).
 
-## Tecnologías
+## Arquitectura y Tecnologías
 
-- Frontend: React, React Router, Vite, Bootstrap y React-Bootstrap.
-- Backend: Java 17, Spring Boot 4, Spring Data JPA, Spring Security y JWT.
-- Persistencia: H2 embebida para desarrollo local; soporte para MySQL mediante configuración JDBC.
-- Documentación API: SpringDoc OpenAPI y Swagger UI.
-- Pruebas frontend: Karma, Jasmine y Testing Library.
-- Mapas: Leaflet y React-Leaflet.
+- **Arquitectura:** Backend monolítico en Spring Boot (`backend/`) consumido de forma asíncrona por el frontend SPA en React (`frontend/`).
+- **Frontend:** React, React Router, Vite, Bootstrap y React-Bootstrap.
+- **Backend:** Java 17+, Spring Boot, Spring Data JPA, Spring Security y JWT (`JwtService`, `JwtAuthenticationFilter`, `SecurityConfig`).
+- **Persistencia:** MySQL (`veterinaria_san_marcos`) mediante JDBC y Hibernate JPA (con carga inicial automática de datos de prueba al iniciar la aplicación).
+- **Documentación API:** SpringDoc OpenAPI y Swagger UI.
+- **Pruebas frontend:** Karma, Jasmine y Testing Library.
+- **Mapas:** Leaflet y React-Leaflet.
 
-## Estructura del proyecto
+## Roles y Cuentas de Prueba
+
+El sistema contempla tres roles principales (`ADMIN`, `RECEPCION` y `DUENO`) con rutas y permisos diferenciados tanto en el frontend como en los endpoints del backend.
+
+- **Administrador (`ADMIN`):** `admin@juanpablo.cl` / `password123`
+- **Recepción (`RECEPCION`):** `recepcion@sanmarcos.cl` / `password123`
+- **Dueño (`DUENO`):** `alej.chandia@duocuc.cl` / `password123`
+
+## Estructura del Proyecto
 
 ```text
 Proyecto-Semestral-FullStack2/
@@ -20,11 +29,11 @@ Proyecto-Semestral-FullStack2/
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/cl/duoc/veterinaria_backend/
-│   │   │   │   ├── controller/       # Endpoints REST
+│   │   │   │   ├── controller/       # Endpoints REST (Auth, Usuarios, Dueños, Mascotas, Citas, Historial)
 │   │   │   │   ├── model/            # Entidades JPA
 │   │   │   │   ├── repository/       # Repositorios Spring Data JPA
-│   │   │   │   ├── security/         # JWT y configuración de seguridad
-│   │   │   │   └── service/         # Reglas de negocio
+│   │   │   │   ├── security/         # JWT, CORS, RBAC y seed inicial
+│   │   │   │   └── service/          # Reglas de negocio
 │   │   │   └── resources/
 │   │   │       └── application.properties
 │   │   └── test/java/cl/duoc/veterinaria_backend/
@@ -33,16 +42,16 @@ Proyecto-Semestral-FullStack2/
 │   └── pom.xml                       # Dependencias y configuración Maven
 ├── frontend/
 │   ├── src/
-│   │   ├── components/               # Componentes reutilizables
+│   │   ├── components/               # Componentes reutilizables y rutas protegidas
 │   │   │   └── citas/                # Componentes relacionados con citas
 │   │   ├── constants/                # Roles y constantes globales
-│   │   ├── context/                  # Estado y contexto de autenticación
-│   │   ├── data/                     # Catálogos y datos iniciales
+│   │   ├── context/                  # Estado y contexto de autenticación JWT
+│   │   ├── data/                     # Catálogos de servicios y medicamentos
 │   │   ├── pages/                    # Vistas de la aplicación
-│   │   │   ├── admin/                # Administración
+│   │   │   ├── admin/                # Administración de usuarios
 │   │   │   ├── dueno/                # Funcionalidades del dueño
 │   │   │   └── recepcion/            # Funcionalidades de recepción
-│   │   ├── services/                 # Clientes HTTP y acceso a la API
+│   │   ├── services/                 # Cliente HTTP (`api.js`) y servicios de dominio
 │   │   ├── test/                     # Pruebas Karma/Jasmine
 │   │   └── utils/                    # Utilidades de citas y horarios
 │   ├── karma.conf.cjs                # Configuración de pruebas
@@ -54,90 +63,75 @@ Proyecto-Semestral-FullStack2/
 ├── .vscode/settings.json             # Integración Maven/Java de VS Code
 ├── .gitignore
 └── README.md
-```
 
-## Requisitos
 
-- Node.js y npm.
-- Java 17 o superior.
-- Google Chrome para ejecutar las pruebas frontend.
-- Git.
+Requisitos Previos
+Node.js y npm.
 
-## Instalación
+Java 17 o superior.
 
+Servidor MySQL activo (por ejemplo, vía XAMPP en el puerto 3306) y base de datos veterinaria_san_marcos (o creada automáticamente según application.properties).
+
+Google Chrome para ejecutar las pruebas frontend.
+
+Git.
+
+Instalación
 Instale las dependencias del frontend:
 
-```bash
+Bash
 cd frontend
 npm install
-```
+Ejecución Local
+1. Base de Datos y Backend
+Verifique que MySQL esté corriendo y revise backend/src/main/resources/application.properties (jdbc:mysql://localhost:3306/veterinaria_san_marcos).
 
-## Ejecución local
+Desde backend/:
 
-### Backend
-
-Desde `backend/`:
-
-```bash
+Bash
 ./mvnw spring-boot:run
-```
+En Windows (PowerShell o CMD):
 
-En Windows:
+DOS
+.\mvnw.cmd spring-boot:run
+API REST: http://localhost:8080/api
 
-```cmd
-mvnw.cmd spring-boot:run
-```
+Swagger UI: http://localhost:8080/swagger-ui/index.html
 
-El backend utiliza una base H2 embebida por defecto, por lo que no requiere configurar MySQL para desarrollo local.
+OpenAPI JSON: http://localhost:8080/v3/api-docs
 
-- API: <http://localhost:8080>
-- Swagger UI: <http://localhost:8080/swagger-ui/index.html>
-- OpenAPI: <http://localhost:8080/v3/api-docs>
+2. Frontend
+Desde frontend/:
 
-### Frontend
-
-Desde `frontend/`:
-
-```bash
+Bash
 npm run dev
-```
+Aplicación web: http://localhost:5173
 
-- Frontend: <http://localhost:5173>
+Configuración de la API y Autenticación
+El frontend consume el backend mediante http://localhost:8080/api (frontend/src/services/api.js).
 
-## Configuración de la API
+Al iniciar sesión en /login (POST /api/auth/login), el token JWT se almacena y se envía en la cabecera Authorization: Bearer <token> en las peticiones protegidas.
 
-El frontend consume el backend mediante `http://localhost:8080/api`.
+Tanto el backend como el frontend deben estar en ejecución para operar con datos persistidos en MySQL.
 
-El backend debe ejecutarse junto al frontend. Los datos almacenados en H2 se recrean al reiniciar Spring Boot.
+Pruebas Frontend
+Ejecute las pruebas desde frontend/:
 
-## Pruebas frontend
-
-Ejecute las pruebas desde `frontend/`:
-
-```bash
+Bash
 npm test
-```
-
 Para mantener Karma en modo observación:
 
-```bash
+Bash
 npm run test:watch
-```
-
-## Compilación frontend
-
-```bash
+Compilación
+Frontend
+Bash
 cd frontend
 npm run build
-```
+El resultado se genera en frontend/dist/.
 
-El resultado se genera en `frontend/dist/`.
-
-## Compilación backend
-
-```bash
+Backend
+Bash
 cd backend
 ./mvnw clean compile
-```
-
-Los artefactos generados como `target/`, `dist/`, `coverage/` y `node_modules/` están excluidos del repositorio mediante `.gitignore`.
+Los artefactos generados como target/, dist/, coverage/ y node_modules/ están excluidos del repositorio mediante .gitignore.
